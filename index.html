@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="google-adsense-account" content="ca-pub-3965836277553422">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3965836277553422" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>今日は何のゴミ？収集日を登録して毎日ひと目で｜ゴミ出しカレンダー</title>
+<meta name="description" content="住んでいる地区の収集日（毎週・第2第4・隔週・祝日の扱い）を一度登録すると、「今日は燃えるゴミ」とだけ大きく表示。夕方からは明日の分を表示します。家族との共有リンク、スマホのカレンダー通知（ics）にも対応。">
+<meta property="og:title" content="ゴミ出しカレンダー｜今日は何のゴミ？">
+<meta property="og:description" content="収集日を登録しておくと「今日は燃えるゴミ」とだけ表示。家族と共有・カレンダー通知つき。">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://gomi.hibitool.com/">
+<meta property="og:url" content="https://gomi.hibitool.com/">
+<meta name="theme-color" content="#2f7d4f">
+<link rel="icon" href="favicon-48.png" sizes="48x48" type="image/png">
+<link rel="icon" href="favicon-192.png" sizes="192x192" type="image/png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"ゴミ出しカレンダー","applicationCategory":"LifestyleApplication","operatingSystem":"Any","url":"https://gomi.hibitool.com/","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},"description":"地区の収集日を登録すると、今日出すゴミだけを大きく表示する。"}
+</script>
+<style>
+:root{--bg:#f2f3ee;--paper:#fff;--ink:#1f2a24;--sub:#5e6b63;--line:#d6dbd3;--green:#2f7d4f;--accent:#e9f2ec}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic",system-ui,sans-serif;font-weight:500;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding:0 16px}
+header.top{background:var(--green);color:#fff}
+header.top .wrap{display:flex;align-items:center;gap:10px;padding-top:12px;padding-bottom:12px}
+header.top svg{width:36px;height:36px;flex:none}
+header.top h1{margin:0;font-size:20px;font-weight:900;letter-spacing:.04em;margin-right:auto}
+header.top .area{font-size:14px;opacity:.9}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid #9fb3a6;background:#fff;color:var(--ink);padding:7px 14px;border-radius:4px;font-size:14px}
+.btn.main{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.btn.sm{padding:4px 10px;font-size:13px}
+/* 今日の看板 */
+.hero{margin:18px 0 0;background:var(--paper);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.hero .when{padding:10px 18px;font-size:15px;color:var(--sub);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.hero .when b{color:var(--ink)}
+.hero .types{display:flex;flex-direction:column}
+.hero .t{background:var(--c);color:#fff;padding:22px 18px;display:flex;align-items:center;gap:16px}
+.hero .t + .t{border-top:3px solid #fff}
+.hero .t svg{width:56px;height:56px;flex:none}
+.hero .t .nm{font-size:40px;font-weight:900;line-height:1.15;letter-spacing:.03em}
+.hero .t .tm{font-size:15px;opacity:.95}
+.hero .none{padding:30px 18px;font-size:28px;font-weight:900;color:var(--sub);text-align:center}
+.hero .none small{display:block;font-size:14px;font-weight:500}
+.hero .nx{padding:10px 18px;font-size:15px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;font-weight:700}
+.chip::before{content:"";width:12px;height:12px;background:var(--c);display:inline-block;border-radius:2px}
+.hero .warn{padding:8px 18px;background:#fff6dc;font-size:13px;border-top:1px solid #ecd9a0}
+/* 2週間 */
+h2{font-size:17px;margin:26px 0 8px;display:flex;align-items:center;gap:8px}
+h2 .sp{flex:1}
+.list{background:var(--paper);border:1px solid var(--line);border-radius:4px}
+.list .r{display:grid;grid-template-columns:6.5em 1fr;padding:8px 14px;border-top:1px solid var(--line);font-size:15px;align-items:center}
+.list .r:first-child{border-top:0}
+.list .r .d{color:var(--sub)}
+.list .r .d.sun{color:#c0392b}.list .r .d.sat{color:#2b6cb0}
+.list .r.today{background:var(--accent)}
+.list .r .cs{display:flex;gap:4px 14px;flex-wrap:wrap}
+.list .r .off{color:#9aa59e;font-size:13px}
+/* 月カレンダー */
+.cal{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px}
+.cal .nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-weight:700}
+.cal table{width:100%;border-collapse:collapse;table-layout:fixed}
+.cal th{font-size:12px;color:var(--sub);font-weight:500;padding:4px 0}
+.cal th:first-child{color:#c0392b}.cal th:last-child{color:#2b6cb0}
+.cal td{vertical-align:top;height:64px;border-top:1px solid var(--line);padding:3px 2px;font-size:12px}
+.cal td .n{font-size:12px;color:var(--sub)}
+.cal td.hol .n,.cal td.sun .n{color:#c0392b}
+.cal td.sat .n{color:#2b6cb0}
+.cal td.today{background:var(--accent)}
+.cal td .m{display:block;background:var(--c);color:#fff;font-size:10px;line-height:1.35;padding:1px 3px;margin-top:2px;border-radius:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal td.other{opacity:.3}
+/* 設定 */
+.setup{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:14px 16px}
+.setup label.f{display:block;font-size:13px;color:var(--sub);margin-bottom:10px}
+.setup input[type=text],.setup input[type=time],.setup input[type=date],.setup select,.setup textarea{font:inherit;font-size:16px;padding:6px 8px;border:1px solid #b5c2b9;border-radius:4px;background:#fff;color:var(--ink)}
+.setup .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+@media (max-width:560px){.setup .row2{grid-template-columns:1fr}}
+.rule{border:1px solid var(--line);border-left:8px solid var(--c);border-radius:4px;padding:10px 12px;margin:10px 0;background:#fcfdfb}
+.rule .l1{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rule .l1 select,.rule .l1 input{max-width:12em}
+.rule .del{margin-left:auto;border:0;background:none;color:#a33;font-size:13px;text-decoration:underline}
+.rule .l2{margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--sub)}
+.tg{display:inline-flex;border:1px solid #b5c2b9;border-radius:4px;overflow:hidden}
+.tg button{border:0;background:#fff;padding:5px 9px;font-size:14px;color:var(--ink);min-width:2.3em}
+.tg button+button{border-left:1px solid #b5c2b9}
+.tg button.on{background:var(--green);color:#fff;font-weight:700}
+.setup .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.empty{background:var(--paper);border:2px solid var(--green);border-radius:4px;padding:18px;margin-top:18px}
+.empty h2{margin-top:0}
+.share{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:12px 16px;font-size:14px}
+.share .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.banner{background:#fff6dc;border:1px solid #ecd9a0;padding:12px 16px;margin-top:16px;border-radius:4px;font-size:14px}
+.msg{font-size:13px;color:var(--green);margin-left:6px}
+section.read{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:4px 18px 12px;margin:26px 0}
+section.read dt{font-weight:700;margin-top:12px}
+section.read dd{margin:2px 0 0;color:var(--sub);font-size:14px}
+footer{padding:20px 0 40px;font-size:12px;color:var(--sub);text-align:center}
+footer a{color:var(--sub)}
+.hide{display:none!important}
+@media (max-width:480px){
+  .hero .t .nm{font-size:32px}
+  .hero .t svg{width:46px;height:46px}
+  .cal td{height:54px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 22h28l-3 32H21z" fill="#fff"/><path d="M14 18h36M27 18v-5h10v5" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M27 28v20M37 28v20" stroke="#2f7d4f" stroke-width="3"/></svg>
+  <h1>ゴミ出しカレンダー</h1><span class="area" id="areaName"></span>
+</div></header>
+
+<main class="wrap">
+  <div id="banner" class="banner hide"></div>
+
+  <div id="emptyBox" class="empty hide">
+    <h2>まず、地区の収集日を登録しましょう</h2>
+    <p style="margin:0 0 10px;font-size:14px">市区町村から配られる「ゴミ収集カレンダー」や、市のホームページを見ながら入れてください。一度入れれば、あとは開くだけで今日のゴミが出ます。</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn main" id="startBlank">自分で登録する</button><button class="btn" id="startSample">よくある例を入れてから直す</button></div>
+  </div>
+
+  <div id="mainView">
+    <div class="hero" id="hero"></div>
+
+    <h2>これから2週間</h2>
+    <div class="list" id="list"></div>
+
+    <h2>月のカレンダー</h2>
+    <div class="cal" id="cal"></div>
+  </div>
+
+  <h2 id="setupH">収集日の登録<span class="sp"></span><button class="btn sm" id="toggleSetup">開く</button></h2>
+  <div class="setup hide" id="setup">
+    <div class="row2">
+      <label class="f">地区の名前（自分用のメモ）<br><input type="text" id="area" placeholder="例：〇〇市 △△地区" style="width:100%"></label>
+      <label class="f">出す時刻（朝◯時までに）<br><input type="time" id="until" value="08:30"></label>
+    </div>
+    <div class="row2">
+      <label class="f">祝日の収集<br><select id="holiday"><option value="collect">祝日も収集する</option><option value="skip">祝日は収集しない</option></select></label>
+      <label class="f">年末年始<br><select id="newyear"><option value="1">12/31〜1/3 は収集しない</option><option value="0">年末年始も通常どおり</option></select></label>
+    </div>
+    <div id="rules"></div>
+    <div class="acts"><button class="btn" id="addRule">＋ ゴミの種類を追加</button><span class="msg" id="saved"></span></div>
+    <p style="font-size:12px;color:var(--sub);margin:10px 0 0">変更はすぐに保存されます（このブラウザの中だけ）。臨時の休みや振替がある日は「日付で指定」に追加するか、カレンダーで確かめてください。</p>
+  </div>
+
+  <h2>家族と共有・スマホに通知</h2>
+  <div class="share">
+    <div>共有リンクを家族に送ると、開いた人のスマホにも同じ収集日を取り込めます。</div>
+    <div class="acts"><button class="btn" id="copyLink">共有リンクをコピー</button><button class="btn" id="dlIcs">カレンダー用ファイル（.ics）</button><span class="msg" id="shareMsg"></span></div>
+    <div style="font-size:12px;color:var(--sub);margin-top:6px">.ics は今日から1年分の収集日を、前日の夜8時に知らせる予定として入れます（iPhone のカレンダーは通知あり。Google カレンダーは取り込み後に通知を設定してください）。</div>
+  </div>
+
+  <section class="read">
+    <h2 style="margin-top:14px">よくある質問</h2>
+    <dl>
+      <dt>「第2・第4水曜」のような地区は？</dt>
+      <dd>種類ごとに「第◯の◯曜」を選び、第2と第4の両方を押してください。第5週は入れない地区が多いので、配布カレンダーに合わせて選びます。</dd>
+      <dt>隔週の収集は？</dt>
+      <dd>「隔週」を選び、収集がある日を1日だけ入れてください。そこから2週間おきに表示します。</dd>
+      <dt>夕方に開くと明日のゴミが出るのはなぜ？</dt>
+      <dd>前日の夜に出せる地区や、翌朝の準備に使えるように、15時を過ぎると「明日の朝」を大きく表示します。今日の分も下に出ています。</dd>
+      <dt>データはどこに保存されますか？</dt>
+      <dd>このブラウザの中だけに保存され、どこにも送信しません。共有リンクには設定がそのまま入っているので、送る相手を選んでください。</dd>
+    </dl>
+  </section>
+</main>
+
+<footer>
+  <a href="https://hibitool.com/">日々のツール（hibitool.com）</a> ・ <a href="https://hibitool.com/privacy.html">プライバシーポリシー</a>
+</footer>
+
+<script>
+const KEY="gomi-settings";
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const WD="日月火水木金土";
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* 祝日 */
+const HC={};
+function holidays(y){
+  if(HC[y]) return HC[y]; const h={};
+  const add=(m,d,n)=>{h[y+"-"+pad(m)+"-"+pad(d)]=n;};
+  const nthMon=(m,n)=>{const f=new Date(y,m-1,1).getDay();return 1+((8-f)%7)+(n-1)*7;};
+  const sp=Math.floor(20.8431+0.242194*(y-1980)-Math.floor((y-1980)/4));
+  const au=Math.floor(23.2488+0.242194*(y-1980)-Math.floor((y-1980)/4));
+  add(1,1,"元日");add(1,nthMon(1,2),"成人の日");add(2,11,"建国記念の日");add(2,23,"天皇誕生日");add(3,sp,"春分の日");add(4,29,"昭和の日");
+  add(5,3,"憲法記念日");add(5,4,"みどりの日");add(5,5,"こどもの日");add(7,nthMon(7,3),"海の日");add(8,11,"山の日");add(9,nthMon(9,3),"敬老の日");
+  add(9,au,"秋分の日");add(10,nthMon(10,2),"スポーツの日");add(11,3,"文化の日");add(11,23,"勤労感謝の日");
+  for(let d=new Date(y,0,2);d.getFullYear()===y;d.setDate(d.getDate()+1)){const p=addDays(d,-1),n=addDays(d,1);if(!h[ymd(d)]&&d.getDay()!==0&&h[ymd(p)]&&h[ymd(n)])h[ymd(d)]="国民の休日";}
+  Object.keys(h).sort().forEach(k=>{const[a,b,c]=k.split("-").map(Number);const d=new Date(a,b-1,c);if(d.getDay()===0){let s=new Date(d);do{s.setDate(s.getDate()+1);}while(h[ymd(s)]);h[ymd(s)]="振替休日";}});
+  return HC[y]=h;
+}
+const holName=d=>holidays(d.getFullYear())[ymd(d)]||null;
+
+/* 種類 */
+const TYPES=[
+  ["燃えるゴミ","#d4512c","burn"],["燃えないゴミ","#6b7280","can"],["プラスチック","#2b78d0","pla"],["びん・缶","#2c8a57","bin"],
+  ["ペットボトル","#16999b","pet"],["古紙・古布","#9a6a36","paper"],["資源ゴミ","#3f8f3a","bin"],["粗大ゴミ","#7b4fb3","big"],["有害ゴミ（電池・スプレー）","#b8920b","can"],["その他","#47605a","can"]
+];
+const ICON={
+  burn:'<svg viewBox="0 0 56 56"><path d="M14 20h28l-3 30H17z" fill="#fff"/><path d="M28 24c6 6 7 11 3 16 1-4-1-6-3-8-1 4-4 5-4 9-3-4-2-10 4-17z" fill="var(--c)"/><path d="M10 16h36" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>',
+  can:'<svg viewBox="0 0 56 56"><path d="M14 20h28l-3 30H17z" fill="#fff"/><path d="M10 16h36" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M22 27v16M28 27v16M34 27v16" stroke="var(--c)" stroke-width="3"/></svg>',
+  pla:'<svg viewBox="0 0 56 56"><path d="M12 18h32l-2 32H14z" fill="#fff"/><path d="M28 24l5 9h-10z" fill="none" stroke="var(--c)" stroke-width="3"/><text x="28" y="45" text-anchor="middle" font-size="9" font-weight="900" fill="var(--c)">プラ</text></svg>',
+  bin:'<svg viewBox="0 0 56 56"><path d="M18 10h8v8l4 6v24H14V24l4-6z" fill="#fff"/><rect x="33" y="24" width="12" height="24" rx="2" fill="#fff"/><path d="M33 30h12" stroke="var(--c)" stroke-width="2"/></svg>',
+  pet:'<svg viewBox="0 0 56 56"><path d="M24 6h8v6l5 7v29a3 3 0 0 1-3 3H22a3 3 0 0 1-3-3V19l5-7z" fill="#fff"/><path d="M19 28h18" stroke="var(--c)" stroke-width="3"/></svg>',
+  paper:'<svg viewBox="0 0 56 56"><rect x="10" y="30" width="36" height="7" fill="#fff"/><rect x="12" y="22" width="32" height="7" fill="#fff"/><rect x="10" y="38" width="36" height="9" fill="#fff"/><path d="M28 20v28M10 42h36" stroke="var(--c)" stroke-width="2"/></svg>',
+  big:'<svg viewBox="0 0 56 56"><rect x="8" y="22" width="40" height="16" rx="3" fill="#fff"/><rect x="12" y="14" width="32" height="10" rx="2" fill="#fff"/><path d="M12 38v8M44 38v8" stroke="#fff" stroke-width="4"/></svg>'
+};
+
+/* 設定 */
+let S={area:"",until:"08:30",holiday:"collect",newyear:"1",rules:[]};
+try{const v=JSON.parse(localStorage.getItem(KEY)||"null"); if(v&&Array.isArray(v.rules)) S=Object.assign(S,v);}catch(e){}
+let sid=Date.now();
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} $("saved").textContent="保存しました"; clearTimeout(save.t); save.t=setTimeout(()=>$("saved").textContent="",1500); }
+function typeOf(r){ return TYPES.find(t=>t[0]===r.name)||[r.name,r.color||"#47605a","can"]; }
+
+/* 収集日の判定 */
+function collects(r,d){
+  const k=ymd(d);
+  if(r.kind==="dates") return (r.dates||[]).includes(k);
+  const dow=d.getDay();
+  if(!(r.days||[]).includes(dow)) return false;
+  if(r.kind==="weekly") return true;
+  if(r.kind==="nth"){ const n=Math.ceil(d.getDate()/7); return (r.nth||[]).includes(n); }
+  if(r.kind==="biweekly"){
+    if(!r.base) return false; const [a,b,c]=r.base.split("-").map(Number);
+    const base=new Date(a,b-1,c); base.setDate(base.getDate()-base.getDay()); // 基準の週の日曜
+    const wk=new Date(d); wk.setDate(wk.getDate()-dow);
+    const diff=Math.round((wk-base)/(7*864e5));
+    return ((diff%2)+2)%2===0;
+  }
+  return false;
+}
+function dayInfo(d){
+  const hn=holName(d);
+  const ny = S.newyear==="1" && ((d.getMonth()===11&&d.getDate()===31)||(d.getMonth()===0&&d.getDate()<=3));
+  const list=[], skipped=[];
+  S.rules.forEach(r=>{
+    if(!collects(r,d)) return;
+    if(r.kind!=="dates" && (ny || (hn && S.holiday==="skip"))) skipped.push(r); else list.push(r);
+  });
+  return {list,skipped,hn,ny};
+}
+
+/* 表示 */
+function render(){
+  const empty=!S.rules.length;
+  $("emptyBox").classList.toggle("hide",!empty);
+  $("mainView").classList.toggle("hide",empty);
+  $("areaName").textContent=S.area||"";
+  if(empty){ return; }
+  const now=new Date();
+  const evening=now.getHours()>=15;
+  const tgt=evening?addDays(now,1):now;
+  const info=dayInfo(tgt);
+  const lbl=evening?"明日の朝":"今日";
+  let h='<div class="when"><span><b>'+lbl+'</b>　'+(tgt.getMonth()+1)+'月'+tgt.getDate()+'日（'+WD[tgt.getDay()]+'）'+(info.hn?'　'+info.hn:'')+'</span><span>'+(S.until?"朝 "+S.until.replace(/^0/,"")+" までに":"")+'</span></div>';
+  if(info.list.length){
+    h+='<div class="types">'+info.list.map(r=>{const t=typeOf(r);return '<div class="t" style="--c:'+t[1]+'">'+(ICON[t[2]]||ICON.can)+'<div><div class="nm">'+esc(r.name)+'</div>'+(r.memo?'<div class="tm">'+esc(r.memo)+'</div>':'')+'</div></div>';}).join("")+'</div>';
+  }else{
+    h+='<div class="none">'+lbl+'は収集なし<small>ゴミ出しはお休みです</small></div>';
+  }
+  if(info.skipped.length) h+='<div class="warn">'+(info.ny?"年末年始":"祝日")+'のため、'+info.skipped.map(r=>esc(r.name)).join("・")+'はお休みの設定です。</div>';
+  // もう一方の日
+  const other=evening?now:addDays(now,1);
+  const oi=dayInfo(other);
+  h+='<div class="nx">'+(evening?"今日（"+WD[now.getDay()]+"）":"明日（"+WD[other.getDay()]+"）")+'：'+(oi.list.length?oi.list.map(r=>'<span class="chip" style="--c:'+typeOf(r)[1]+'">'+esc(r.name)+'</span>').join(""):'<span style="color:var(--sub)">収集なし</span>')+'</div>';
+  // 次の◯◯
+  const nexts=S.rules.map(r=>{for(let i=1;i<=62;i++){const d=addDays(tgt,i);if(dayInfo(d).list.includes(r))return [r,d,i];}return null;}).filter(Boolean).filter(x=>x[2]>1).sort((a,b)=>a[2]-b[2]).slice(0,3);
+  if(nexts.length) h+='<div class="nx" style="font-size:13px;color:var(--sub)">次は：'+nexts.map(([r,d])=>'<span class="chip" style="--c:'+typeOf(r)[1]+';font-weight:500">'+esc(r.name)+' '+(d.getMonth()+1)+'/'+d.getDate()+'（'+WD[d.getDay()]+'）</span>').join("")+'</div>';
+  $("hero").innerHTML=h;
+  // 2週間
+  let l="";
+  for(let i=0;i<14;i++){
+    const d=addDays(now,i), x=dayInfo(d);
+    const cls=d.getDay()===0||x.hn?"sun":d.getDay()===6?"sat":"";
+    l+='<div class="r'+(i===0?" today":"")+'"><span class="d '+cls+'">'+(d.getMonth()+1)+'/'+d.getDate()+'（'+WD[d.getDay()]+'）</span><span class="cs">'+
+      (x.list.length?x.list.map(r=>'<span class="chip" style="--c:'+typeOf(r)[1]+'">'+esc(r.name)+'</span>').join(""):'<span class="off">―</span>')+
+      (x.skipped.length?'<span class="off">（'+x.skipped.map(r=>esc(r.name)).join("・")+' 休み）</span>':'')+'</span></div>';
+  }
+  $("list").innerHTML=l;
+  drawCal();
+}
+let calY,calM;
+function drawCal(){
+  const now=new Date(); if(calY==null){calY=now.getFullYear();calM=now.getMonth();}
+  const first=new Date(calY,calM,1); const start=addDays(first,-first.getDay());
+  let h='<div class="nav"><button class="btn sm" id="pm">‹ 前の月</button><span>'+calY+'年'+(calM+1)+'月</span><button class="btn sm" id="nm">次の月 ›</button></div><table><tr>'+[..."日月火水木金土"].map(w=>'<th>'+w+'</th>').join("")+'</tr>';
+  for(let w=0;w<6;w++){
+    const rowStart=addDays(start,w*7); if(w>3&&rowStart.getMonth()!==calM) break;
+    h+='<tr>';
+    for(let k=0;k<7;k++){
+      const d=addDays(start,w*7+k), x=dayInfo(d);
+      const cl=[d.getMonth()!==calM?"other":"",ymd(d)===ymd(now)?"today":"",x.hn?"hol":"",k===0?"sun":k===6?"sat":""].join(" ");
+      h+='<td class="'+cl+'"><span class="n">'+d.getDate()+'</span>'+x.list.map(r=>'<span class="m" style="--c:'+typeOf(r)[1]+'">'+esc(short(r.name))+'</span>').join("")+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</table>';
+  $("cal").innerHTML=h;
+  $("pm").onclick=()=>{calM--;if(calM<0){calM=11;calY--;}drawCal();};
+  $("nm").onclick=()=>{calM++;if(calM>11){calM=0;calY++;}drawCal();};
+}
+function short(n){ return n.replace("ゴミ","").replace("（電池・スプレー）","").replace("ペットボトル","ペット").replace("プラスチック","プラ")||n; }
+
+/* 設定画面 */
+function drawRules(){
+  $("area").value=S.area; $("until").value=S.until; $("holiday").value=S.holiday; $("newyear").value=S.newyear;
+  $("rules").innerHTML=S.rules.map((r,i)=>{
+    const t=typeOf(r); const known=TYPES.some(x=>x[0]===r.name);
+    const opts=TYPES.map(x=>'<option'+(x[0]===r.name||(!known&&x[0]==="その他")?" selected":"")+'>'+x[0]+'</option>').join("");
+    let l2="";
+    if(r.kind==="dates"){
+      l2='日付（改行かカンマ区切り。例 2026-12-05）<br><textarea data-i="'+i+'" data-f="dates" rows="2" style="width:100%">'+esc((r.dates||[]).join("\n"))+'</textarea>';
+    }else{
+      if(r.kind==="nth") l2+='第 <span class="tg" data-i="'+i+'" data-f="nth">'+[1,2,3,4,5].map(n=>'<button data-v="'+n+'" class="'+((r.nth||[]).includes(n)?"on":"")+'">'+n+'</button>').join("")+'</span> 週の';
+      l2+=' <span class="tg" data-i="'+i+'" data-f="days">'+[1,2,3,4,5,6,0].map(n=>'<button data-v="'+n+'" class="'+((r.days||[]).includes(n)?"on":"")+'">'+WD[n]+'</button>').join("")+'</span> 曜日';
+      if(r.kind==="biweekly") l2+='<br>収集がある日を1日：<input type="date" data-i="'+i+'" data-f="base" value="'+(r.base||"")+'">';
+    }
+    return '<div class="rule" style="--c:'+t[1]+'"><div class="l1">'+
+      '<select data-i="'+i+'" data-f="type">'+opts+'</select>'+
+      (!known||r.name==="その他"?'<input type="text" data-i="'+i+'" data-f="name" value="'+esc(r.name==="その他"?"":r.name)+'" placeholder="名前">':'')+
+      '<select data-i="'+i+'" data-f="kind"><option value="weekly"'+(r.kind==="weekly"?" selected":"")+'>毎週</option><option value="nth"'+(r.kind==="nth"?" selected":"")+'>第◯の◯曜</option><option value="biweekly"'+(r.kind==="biweekly"?" selected":"")+'>隔週</option><option value="dates"'+(r.kind==="dates"?" selected":"")+'>日付で指定</option></select>'+
+      '<button class="del" data-i="'+i+'" data-f="del">削除</button></div>'+
+      '<div class="l2">'+l2+'</div>'+
+      '<div class="l2"><input type="text" data-i="'+i+'" data-f="memo" value="'+esc(r.memo||"")+'" placeholder="メモ（例：黄色い袋・汚れたものは燃える）" style="width:100%;font-size:14px"></div></div>';
+  }).join("");
+}
+$("rules").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  const host=b.closest("[data-f]"); if(!host) return;
+  const i=+host.dataset.i, f=host.dataset.f, r=S.rules[i];
+  if(f==="del"){ S.rules.splice(i,1); }
+  else if(f==="days"||f==="nth"){ const v=+b.dataset.v; const a=r[f]||(r[f]=[]); const k=a.indexOf(v); if(k>=0)a.splice(k,1); else a.push(v); a.sort(); }
+  else return;
+  save(); drawRules(); render();
+});
+$("rules").addEventListener("change",e=>{
+  const el=e.target; const i=+el.dataset.i, f=el.dataset.f, r=S.rules[i]; if(!r) return;
+  if(f==="type"){ const t=TYPES.find(x=>x[0]===el.value); r.name=t[0]; r.color=t[1]; }
+  else if(f==="name"){ r.name=el.value.trim()||"その他"; }
+  else if(f==="kind"){ r.kind=el.value; if(r.kind==="nth"&&!(r.nth||[]).length) r.nth=[2,4]; if(r.kind==="biweekly"&&!r.base) r.base=ymd(new Date()); if(!r.days) r.days=[]; }
+  else if(f==="base"){ r.base=el.value; }
+  else if(f==="dates"){ r.dates=el.value.split(/[\s,、]+/).map(s=>s.trim().replace(/\//g,"-")).filter(s=>/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)).map(s=>{const[a,b,c]=s.split("-");return a+"-"+pad(+b)+"-"+pad(+c);}); }
+  else if(f==="memo"){ r.memo=el.value; save(); render(); return; }
+  save(); drawRules(); render();
+});
+["area","until","holiday","newyear"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).value;save();render();}));
+$("addRule").onclick=()=>{ S.rules.push({name:"燃えるゴミ",color:"#d4512c",kind:"weekly",days:[]}); save(); drawRules(); render(); };
+function openSetup(open){ $("setup").classList.toggle("hide",!open); $("toggleSetup").textContent=open?"閉じる":"開く"; if(open) drawRules(); }
+$("toggleSetup").onclick=()=>openSetup($("setup").classList.contains("hide"));
+$("startBlank").onclick=()=>{ S.rules=[{name:"燃えるゴミ",color:"#d4512c",kind:"weekly",days:[]}]; save(); render(); openSetup(true); $("setupH").scrollIntoView({behavior:"smooth"}); };
+$("startSample").onclick=()=>{
+  S.rules=[
+    {name:"燃えるゴミ",color:"#d4512c",kind:"weekly",days:[1,4]},
+    {name:"プラスチック",color:"#2b78d0",kind:"weekly",days:[3]},
+    {name:"びん・缶",color:"#2c8a57",kind:"nth",nth:[2,4],days:[5]},
+    {name:"ペットボトル",color:"#16999b",kind:"nth",nth:[1,3],days:[5]},
+    {name:"燃えないゴミ",color:"#6b7280",kind:"nth",nth:[1],days:[2]},
+    {name:"古紙・古布",color:"#9a6a36",kind:"nth",nth:[3],days:[2]}
+  ];
+  save(); render(); openSetup(true); $("banner").classList.remove("hide"); $("banner").textContent="例を入れました。曜日や週をお住まいの地区のカレンダーに合わせて直してください。";
+};
+
+/* 共有リンク */
+function b64e(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function b64d(s){ s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; return decodeURIComponent(escape(atob(s))); }
+$("copyLink").onclick=async()=>{
+  if(!S.rules.length){ $("shareMsg").textContent="先に収集日を登録してください"; return; }
+  const url=location.href.split("#")[0]+"#s="+b64e(JSON.stringify(S));
+  try{ await navigator.clipboard.writeText(url); $("shareMsg").textContent="コピーしました。LINE などに貼って送れます"; }
+  catch(e){ $("shareMsg").innerHTML='コピーできませんでした。下のリンクを長押しでコピー：<br><input style="width:100%" value="'+esc(url)+'" readonly>'; }
+};
+function checkImport(){
+  const m=location.hash.match(/#s=([\w-]+)/); if(!m) return;
+  let v; try{ v=JSON.parse(b64d(m[1])); }catch(e){ return; }
+  if(!v||!Array.isArray(v.rules)) return;
+  const b=$("banner"); b.classList.remove("hide");
+  b.innerHTML='共有された収集日'+(v.area?'（<b>'+esc(v.area)+'</b>）':'')+'があります。'+v.rules.map(r=>esc(r.name)).join("・")+' <div style="margin-top:8px;display:flex;gap:8px"><button class="btn main" id="imp">このスマホに取り込む</button><button class="btn" id="impNo">取り込まない</button></div>'+(S.rules.length?'<div style="font-size:12px;margin-top:4px">今の登録は上書きされます。</div>':'');
+  const clear=()=>{ history.replaceState(null,"",location.pathname+location.search); b.classList.add("hide"); };
+  $("imp").onclick=()=>{ S=Object.assign({area:"",until:"08:30",holiday:"collect",newyear:"1",rules:[]},v); save(); clear(); render(); };
+  $("impNo").onclick=clear;
+}
+
+/* ics */
+$("dlIcs").onclick=()=>{
+  if(!S.rules.length){ $("shareMsg").textContent="先に収集日を登録してください"; return; }
+  const now=new Date(); const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//hibitool//gomi//JA","CALSCALE:GREGORIAN","X-WR-CALNAME:ゴミ出し"+(S.area?"（"+S.area+"）":"")];
+  const stamp=now.toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+  for(let i=0;i<366;i++){
+    const d=addDays(now,i), x=dayInfo(d); if(!x.list.length) continue;
+    const ds=ymd(d).replace(/-/g,""), de=ymd(addDays(d,1)).replace(/-/g,"");
+    const title=x.list.map(r=>r.name).join("・");
+    L.push("BEGIN:VEVENT","UID:gomi-"+ds+"@hibitool.com","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+ds,"DTEND;VALUE=DATE:"+de,
+      "SUMMARY:"+title,"DESCRIPTION:"+(S.until?"朝"+S.until+"までに":""),"TRANSP:TRANSPARENT",
+      "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:明日は"+title,"TRIGGER:-PT4H","END:VALARM","END:VEVENT");
+  }
+  L.push("END:VCALENDAR");
+  const blob=new Blob([L.join("\r\n")],{type:"text/calendar"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="gomi-calendar.ics"; document.body.appendChild(a); a.click(); a.remove();
+  $("shareMsg").textContent="ファイルを保存しました。開くとカレンダーに追加できます";
+};
+
+render();
+if(!S.rules.length){} else drawRules();
+checkImport();
+// 日付が変わったら描き直す
+setInterval(()=>{ const k=new Date().getHours(); if(k!==render.h){ render.h=k; render(); } },60000);
+</script>
+</body>
+</html>
