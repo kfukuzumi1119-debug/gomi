@@ -17,6 +17,10 @@
 <link rel="icon" href="favicon-192.png" sizes="192x192" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ゴミ出し">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
@@ -106,6 +110,15 @@ section.read dd{margin:2px 0 0;color:var(--sub);font-size:14px}
 footer{padding:20px 0 40px;font-size:12px;color:var(--sub);text-align:center}
 footer a{color:var(--sub)}
 .hide{display:none!important}
+.pbox{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:4px 16px 14px;margin:26px 0 0}
+.pbox h2{margin:12px 0 4px}
+.pbox p{margin:4px 0;font-size:14px}
+.prow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:14px}
+.prow select{font:inherit;font-size:16px;padding:5px 8px;border:1px solid #b5c2b9;border-radius:4px;background:#fff;color:var(--ink)}
+.pbtn{font:inherit;font-size:14px;padding:8px 16px;border:1px solid #9fb3a6;border-radius:4px;background:#fff;color:var(--ink);cursor:pointer}
+.pbtn.main{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.pmsg{color:var(--sub);font-size:13px!important;min-height:1em}
+.pios{font-size:13px;background:#fff6dc;border:1px solid #ecd9a0;padding:8px 12px;border-radius:4px;margin-top:10px}
 @media (max-width:480px){
   .hero .t .nm{font-size:32px}
   .hero .t svg{width:46px;height:46px}
@@ -153,7 +166,16 @@ footer a{color:var(--sub)}
     <p style="font-size:12px;color:var(--sub);margin:10px 0 0">変更はすぐに保存されます（このブラウザの中だけ）。臨時の休みや振替がある日は「日付で指定」に追加するか、カレンダーで確かめてください。</p>
   </div>
 
-  <h2>家族と共有・スマホに通知</h2>
+  <section class="pbox" id="pushBox">
+    <h2>通知</h2>
+    <p id="pushState"></p>
+    <div class="prow"><label>知らせる時刻 <select id="pushTime"><option value="1140">前日 19:00</option><option value="1200" selected>前日 20:00</option><option value="1260">前日 21:00</option><option value="1320">前日 22:00</option><option value="360">当日 6:00</option><option value="390">当日 6:30</option><option value="420">当日 7:00</option><option value="450">当日 7:30</option></select></label></div>
+    <div class="prow"><button class="pbtn main" id="pushOn">通知をオンにする</button><button class="pbtn" id="pushTest">テスト通知</button><button class="pbtn" id="pushOff">オフにする</button></div>
+    <p class="pmsg" id="pushMsg"></p>
+    <div class="pios hide" id="pushIos"><b>iPhone・iPad の場合</b>：Safari の共有ボタン（□に↑）→「ホーム画面に追加」で追加し、ホーム画面のアイコンから開くと通知をオンにできます（iOS 16.4 以降）。</div>
+  </section>
+
+  <h2>家族と共有・カレンダーに入れる</h2>
   <div class="share">
     <div>共有リンクを家族に送ると、開いた人のスマホにも同じ収集日を取り込めます。</div>
     <div class="acts"><button class="btn" id="copyLink">共有リンクをコピー</button><button class="btn" id="dlIcs">カレンダー用ファイル（.ics）</button><span class="msg" id="shareMsg"></span></div>
@@ -224,7 +246,7 @@ const ICON={
 let S={area:"",until:"08:30",holiday:"collect",newyear:"1",rules:[]};
 try{const v=JSON.parse(localStorage.getItem(KEY)||"null"); if(v&&Array.isArray(v.rules)) S=Object.assign(S,v);}catch(e){}
 let sid=Date.now();
-function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} $("saved").textContent="保存しました"; clearTimeout(save.t); save.t=setTimeout(()=>$("saved").textContent="",1500); }
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} if(window.pushSync) pushSync(); $("saved").textContent="保存しました"; clearTimeout(save.t); save.t=setTimeout(()=>$("saved").textContent="",1500); }
 function typeOf(r){ return TYPES.find(t=>t[0]===r.name)||[r.name,r.color||"#47605a","can"]; }
 
 /* 収集日の判定 */
@@ -419,6 +441,15 @@ if(!S.rules.length){} else drawRules();
 checkImport();
 // 日付が変わったら描き直す
 setInterval(()=>{ const k=new Date().getHours(); if(k!==render.h){ render.h=k; render(); } },60000);
+
+/* 通知の設定（共通部品 push-client.js が使う） */
+const PUSH_APP="gomi";
+try{ const v=localStorage.getItem("gomi-push-time"); if(v&&[...$("pushTime").options].some(o=>o.value===v)) $("pushTime").value=v; }catch(e){}
+function pushPayload(){ const m=+$("pushTime").value; return {minute:m, settings:{minute:m, data:S}}; }
+function pushDesc(){ const m=+$("pushTime").value; return (m>=720?"前日の ":"当日の ")+Math.floor(m/60)+":"+pad(m%60)+" に、収集がある日だけ「"+(m>=720?"明日":"今日")+"は燃えるゴミ」のようにお知らせします。"; }
+function pushReady(){ return S.rules.length?"":"先に収集日を登録してください。"; }
+$("pushTime").onchange=()=>{ try{localStorage.setItem("gomi-push-time",$("pushTime").value);}catch(e){} pushSync(); };
 </script>
+<script src="push-client.js"></script>
 </body>
 </html>
