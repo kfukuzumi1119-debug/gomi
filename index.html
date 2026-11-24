@@ -116,6 +116,18 @@ h2 .sp{flex:1}
 .rule .del.sure{background:#b3261e;color:#fff;text-decoration:none;border-radius:4px;padding:5px 10px}
 details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
 details.more summary{cursor:pointer;font-size:14px;color:var(--green);font-weight:700;margin-bottom:8px}
+.wk{margin-top:6px}
+.wk input[type=search]{width:100%;font-size:16px;padding:9px 12px;border:1px solid #9fb3a6;border-radius:4px;background:#fff}
+.wkTabs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wkTabs button{border:1px solid #9fb3a6;background:#fff;border-radius:4px;padding:4px 10px;font-size:13px;color:var(--ink)}
+.wkTabs button.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.wi{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:4px;padding:10px 12px;margin:8px 0}
+.wi .wt{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.wi .wn{font-weight:900;font-size:16px}
+.wi .bd{background:var(--c);color:#fff;font-size:12px;font-weight:700;border-radius:4px;padding:2px 8px}
+.wi .nx{font-size:12px;color:var(--green);font-weight:700}
+.wi p{margin:4px 0 0;font-size:14px;line-height:1.65}
+.wi .alt{font-size:12px;color:var(--sub)}
 .tg{display:inline-flex;border:1px solid #b5c2b9;border-radius:4px;overflow:hidden}
 .tg button{border:0;background:#fff;padding:5px 9px;font-size:14px;color:var(--ink);min-width:2.3em}
 .tg button+button{border-left:1px solid #b5c2b9}
@@ -176,6 +188,14 @@ footer a{color:var(--sub)}
     <h2>月のカレンダー</h2>
     <div class="cal" id="cal"></div>
   </div>
+
+  <section class="wk hide" id="wk">
+    <h2>迷いやすいゴミの分け方</h2>
+    <input type="search" id="wkQ" placeholder="ゴミの名前で探す（例：電池、ガラス、スプレー）" autocomplete="off">
+    <div class="wkTabs" id="wkTabs"></div>
+    <div id="wkList"></div>
+    <p class="small">全国で多い分け方の目安です。お住まいの市区町村で違うことがあるので、迷ったら自治体の分別表やホームページで確かめてください。<a href="wakekata/">分け方の一覧ページ</a></p>
+  </section>
 
   <h2 id="setupH">収集日の登録・変更<span class="sp"></span><button class="btn sm" id="toggleSetup">開く</button></h2>
   <div class="setup hide" id="setup">
@@ -509,5 +529,35 @@ function pushReady(){ return S.rules.length?"":"先に収集日を登録して�
 $("pushTime").onchange=()=>{ try{localStorage.setItem("gomi-push-time",$("pushTime").value);}catch(e){} pushSync(); };
 </script>
 <script src="push-client.js"></script>
+<script>
+/* 迷いやすいゴミの分け方（WK は公開時に wakekata.json から入る） */
+const WK={"cats": {"moeru": ["燃えるゴミ", "#d4512c", ["燃えるゴミ"]], "moenai": ["燃えないゴミ", "#6b7280", ["燃えないゴミ"]], "pura": ["プラスチック", "#2b78d0", ["プラスチック"]], "bin": ["びん・缶", "#2c8a57", ["びん・缶", "資源ゴミ"]], "pet": ["ペットボトル", "#16999b", ["ペットボトル", "資源ゴミ"]], "koshi": ["古紙・古布", "#9a6a36", ["古紙・古布", "資源ゴミ"]], "yugai": ["有害・危険ゴミ", "#b8920b", ["有害ゴミ（電池・スプレー）"]], "sodai": ["粗大ゴミ", "#7b4fb3", ["粗大ゴミ"]], "mise": ["ゴミに出さない（店・回収へ）", "#47605a", []]}, "groups": [["denchi", "電池・電気のもの"], ["kiken", "割れもの・刃物・危ないもの"], ["kitchen", "台所のもの"], ["pura", "プラスチック・容器"], ["kurashi", "日用品・衣類"], ["ooki", "大きいもの・家電"]], "items": [{"g": "denchi", "n": "乾電池（単1〜単4・9V）", "k": "でんち かんでんち アルカリ マンガン", "c": "yugai", "a": "燃えないゴミの日に透明な袋で出す地域や、店の回収箱に入れる地域もあります", "h": "＋と−の端にセロハンテープを貼って、ショートや発火を防ぎます。"}, {"g": "denchi", "n": "ボタン電池・コイン電池", "k": "でんち ボタン コイン 時計 リチウム CR2032", "c": "mise", "a": "有害ゴミで出せる地域もあります", "h": "家電量販店や時計店などにある「ボタン電池回収缶」へ。両面にテープを貼ります。飲み込み事故が多いので、子どもの手の届かない所に保管を。"}, {"g": "denchi", "n": "モバイルバッテリー・充電池", "k": "リチウムイオン でんち 充電式 じゅうでん バッテリー", "c": "mise", "a": "有害ゴミや拠点回収で受け付ける自治体もあります", "h": "燃える・燃えないゴミには絶対に入れないでください。収集車や処理施設の火災の大きな原因です。家電量販店などの「小型充電式電池リサイクル」回収箱へ。膨らんだ・壊れたものは自治体に相談を。"}, {"g": "denchi", "n": "電子たばこ・加熱式たばこ", "k": "たばこ アイコス でんし", "c": "mise", "a": "", "h": "電池が入っているので、ゴミには出さずメーカーの回収や販売店へ。たばこの吸い殻は火を消して燃えるゴミ。"}, {"g": "denchi", "n": "スマホ・携帯電話", "k": "けいたい スマートフォン", "c": "mise", "a": "小型家電の回収ボックスがある自治体も", "h": "携帯電話ショップや小型家電の回収ボックスへ。データを消してから出しましょう。"}, {"g": "denchi", "n": "ドライヤー・電気ポットなど小型家電", "k": "こがたかでん ドライヤー ポット トースター アイロン ゲーム機", "c": "moenai", "a": "小型家電の回収ボックス、30cm 以上は粗大ゴミの地域が多いです", "h": "電池が外せるものは外して別に出します。"}, {"g": "denchi", "n": "蛍光灯", "k": "けいこうとう 照明", "c": "yugai", "a": "家電量販店の回収や、燃えないゴミの日に別にして出す地域もあります", "h": "水銀が入っているので割らないように、買ったときのケースや紙で包んで出します。"}, {"g": "denchi", "n": "電球・LED電球", "k": "でんきゅう エルイーディー", "c": "moenai", "a": "", "h": "割れないよう紙で包みます。蛍光灯とは分け方が違うことが多いので注意。"}, {"g": "denchi", "n": "水銀の体温計・血圧計", "k": "たいおんけい けつあつけい すいぎん", "c": "yugai", "a": "薬局や自治体の拠点で回収している地域もあります", "h": "割らずにケースに入れて。電子体温計は電池を外して燃えないゴミ（または小型家電）。"}, {"g": "kiken", "n": "ガラスの破片・割れたコップ", "k": "われもの ガラス はへん コップ グラス", "c": "moenai", "a": "", "h": "厚紙や新聞紙で包み、袋に「キケン」「ガラス」と書きます。コップや耐熱ガラスは、割れていなくても「びん」の日ではなく燃えないゴミが一般的です。"}, {"g": "kiken", "n": "割れた茶わん・お皿（陶磁器）", "k": "ちゃわん さら せともの とうき われもの", "c": "moenai", "a": "", "h": "新聞紙で包んで「キケン」と書いて出します。"}, {"g": "kiken", "n": "鏡", "k": "かがみ", "c": "moenai", "a": "大きいものは粗大ゴミ", "h": "割れたものは包んで「キケン」と書きます。"}, {"g": "kiken", "n": "包丁・はさみ・カミソリ", "k": "ほうちょう はもの ナイフ ハサミ かみそり", "c": "moenai", "a": "金属ゴミ・資源の地域もあります", "h": "刃を厚紙で包んでテープで留め、「キケン」と書いて出します。"}, {"g": "kiken", "n": "スプレー缶・カセットボンベ", "k": "スプレー ボンベ ガス 殺虫剤 ヘアスプレー", "c": "yugai", "a": "びん・缶の日に別の袋で出す地域も多いです", "h": "必ず中身を使い切ってから。穴を開けるかどうかは自治体の指示に従ってください（「開けない」に変わった地域が増えています）。"}, {"g": "kiken", "n": "ライター", "k": "らいたー", "c": "yugai", "a": "燃えないゴミの地域もあります", "h": "ガスを使い切ってから出します。"}, {"g": "kiken", "n": "使い捨てカイロ", "k": "カイロ ホッカイロ", "c": "moenai", "a": "燃えるゴミで出せる地域も多いです", "h": "中身は鉄の粉です。"}, {"g": "kiken", "n": "消火器", "k": "しょうかき", "c": "mise", "a": "", "h": "ほとんどの自治体で収集しません。販売店や「消火器リサイクル推進センター」の窓口へ。"}, {"g": "kiken", "n": "ペンキ・塗料", "k": "とりょう ぺんき", "c": "moeru", "a": "缶は中身を出して燃えないゴミ", "h": "液体のまま出さず、新聞紙などに吸わせて乾かしてから出します。"}, {"g": "kiken", "n": "注射針", "k": "ちゅうしゃ はり インスリン", "c": "mise", "a": "", "h": "ゴミに出さず、もらった病院や薬局へ返します。"}, {"g": "kitchen", "n": "使い終わった食用油", "k": "あぶら てんぷら油 サラダ油", "c": "moeru", "a": "回収して資源にしている地域もあります", "h": "流しに捨てず、固める薬剤や、牛乳パックに紙や布を入れて吸わせてから出します。"}, {"g": "kitchen", "n": "フライパン・鍋・やかん", "k": "なべ やかん フライパン", "c": "moenai", "a": "金属ゴミ・資源の地域や、大きさで粗大ゴミの地域も", "h": "取っ手がプラスチックでもそのまま出せる地域がほとんどです。"}, {"g": "kitchen", "n": "アルミホイル", "k": "あるみ ホイル", "c": "moenai", "a": "汚れていなければ資源（缶）の地域、燃えるゴミの地域も", "h": "汚れたものは燃えないゴミが多いです。"}, {"g": "kitchen", "n": "保冷剤", "k": "ほれいざい アイスノン", "c": "moeru", "a": "", "h": "中身は水と吸水ポリマーです。中身を流しに捨てるのはやめましょう（詰まりの原因）。"}, {"g": "kitchen", "n": "乾燥剤（シリカゲル）", "k": "かんそうざい シリカゲル", "c": "moeru", "a": "", "h": "「石灰乾燥剤」は水にぬれると熱くなるので、水気のある生ゴミと一緒にしないようにします。"}, {"g": "kitchen", "n": "卵のパック", "k": "たまご パック", "c": "pura", "a": "紙製のパックは燃えるゴミ", "h": "軽く洗って出します。"}, {"g": "kitchen", "n": "汚れが落ちないプラ容器", "k": "弁当 よごれ カップ 納豆", "c": "moeru", "a": "燃えないゴミの地域も", "h": "さっと洗って落ちる汚れならプラスチック、落ちないものは燃えるゴミにする地域が多いです。"}, {"g": "kitchen", "n": "カップ麺の容器", "k": "カップめん ラーメン", "c": "pura", "a": "紙製の容器は燃えるゴミ", "h": "容器のマーク（プラ・紙）で分けます。"}, {"g": "kitchen", "n": "生ゴミ", "k": "なまごみ 残飯", "c": "moeru", "a": "", "h": "水をよく切って出すと、重さと臭いが減ります。"}, {"g": "pura", "n": "ペットボトルのキャップ・ラベル", "k": "キャップ ふた ラベル", "c": "pura", "a": "", "h": "本体と分けます。本体は中を軽くすすいでペットボトルへ。"}, {"g": "pura", "n": "発泡スチロール", "k": "はっぽう スチロール トレー", "c": "pura", "a": "大きいものは粗大ゴミ、白いトレーは店の回収も", "h": "大きいものは小さく割って出せる地域もあります。"}, {"g": "pura", "n": "歯ブラシ・プラスチックのおもちゃ", "k": "はぶらし おもちゃ ハンガー バケツ", "c": "moeru", "a": "「プラスチック製品」として回収する地域、燃えないゴミの地域も", "h": "容器・包装ではないプラスチック製品は、地域で分け方が大きく違います。電池入りのおもちゃは電池を外して。"}, {"g": "pura", "n": "ビデオテープ・CD・DVD", "k": "ビデオ シーディー ディーブイディー", "c": "moeru", "a": "燃えないゴミの地域も", "h": "ケースはプラスチック、紙のジャケットは古紙へ。"}, {"g": "pura", "n": "ハンガー", "k": "はんがー", "c": "moeru", "a": "針金のものは燃えないゴミ・金属、プラ製はプラスチック製品の地域も", "h": "クリーニング店で回収していることもあります。"}, {"g": "kurashi", "n": "紙おむつ", "k": "おむつ オムツ", "c": "moeru", "a": "", "h": "汚物はトイレに流してから、小さく丸めて袋に入れます。"}, {"g": "kurashi", "n": "衣類・タオル", "k": "ふく いるい タオル", "c": "koshi", "a": "汚れたもの・破れたものは燃えるゴミ", "h": "雨の日は出さない地域が多いです（ぬれると資源にならないため）。"}, {"g": "kurashi", "n": "靴・かばん", "k": "くつ かばん バッグ", "c": "moeru", "a": "金具が多いものは燃えないゴミ", "h": ""}, {"g": "kurashi", "n": "傘", "k": "かさ", "c": "moenai", "a": "粗大ゴミの地域、金属部分とビニールを分ける地域も", "h": ""}, {"g": "kurashi", "n": "化粧品のびん", "k": "けしょうひん びん 香水", "c": "bin", "a": "汚れが落ちないものは燃えないゴミ", "h": "中を空にして軽くすすぎます。ポンプやキャップは外します。"}, {"g": "kurashi", "n": "薬・湿布", "k": "くすり しっぷ", "c": "moeru", "a": "", "h": "びんは びん・缶、薬のシートはプラスチックや燃えるゴミ（地域で違います）。"}, {"g": "kurashi", "n": "レシート・写真", "k": "れしーと しゃしん 感熱紙", "c": "moeru", "a": "", "h": "感熱紙や写真は古紙にならないので燃えるゴミへ。"}, {"g": "kurashi", "n": "ティッシュの箱", "k": "ティッシュ はこ", "c": "koshi", "a": "", "h": "取り出し口のフィルムを外して、つぶして出します。"}, {"g": "kurashi", "n": "植木鉢・土", "k": "うえきばち つち", "c": "moenai", "a": "プラ製の鉢は燃える・プラの地域も。土は収集しない自治体が多いです", "h": "土は少量でも収集しない地域が多いので、園芸店の回収などを利用します。"}, {"g": "kurashi", "n": "灰（炭・たばこ・線香）", "k": "はい すみ たばこ せんこう", "c": "moeru", "a": "", "h": "完全に火を消し、水をかけてから出します。"}, {"g": "ooki", "n": "布団・カーペット", "k": "ふとん じゅうたん", "c": "sodai", "a": "小さく切れば燃えるゴミで出せる地域も", "h": "粗大ゴミは事前の申し込みと手数料（シール）が必要なことがほとんどです。"}, {"g": "ooki", "n": "家具・自転車", "k": "かぐ じてんしゃ いす つくえ", "c": "sodai", "a": "", "h": "申し込みをして、決められた日に出します。"}, {"g": "ooki", "n": "エアコン・テレビ・冷蔵庫・洗濯機", "k": "かでん れいぞうこ せんたくき テレビ エアコン 冷凍庫 乾燥機", "c": "mise", "a": "", "h": "家電リサイクル法の対象で、粗大ゴミにも出せません。買った店か買い替える店に引き取りを頼むか、自治体の案内に従います（リサイクル料金がかかります）。"}, {"g": "ooki", "n": "パソコン・ディスプレイ", "k": "パソコン ノートパソコン モニター", "c": "mise", "a": "小型家電の回収をしている自治体も", "h": "メーカーの回収（PCリサイクル）などへ。データを消してから出しましょう。"}]};
+(function(){
+  if(!WK) return;
+  $("wk").classList.remove("hide");
+  let G=WK.groups[0][0];
+  function nextFor(names){
+    if(!names.length||!S.rules.some(r=>names.includes(r.name))) return "";
+    const t=new Date(); t.setHours(0,0,0,0);
+    for(let i=0;i<62;i++){ const d=addDays(t,i); if(dayInfo(d).list.some(r=>names.includes(r.name)))
+      return "あなたの地区："+(i===0?"今日":i===1?"明日":(d.getMonth()+1)+"/"+d.getDate()+"（"+WD[d.getDay()]+"）")+"に出せます"; }
+    return "";
+  }
+  function draw(){
+    const q=$("wkQ").value.trim();
+    $("wkTabs").innerHTML=WK.groups.map(g=>'<button data-g="'+g[0]+'" class="'+(!q&&G===g[0]?"on":"")+'">'+g[1]+'</button>').join("");
+    const its=WK.items.filter(x=>q?(x.n+" "+x.k).toLowerCase().includes(q.toLowerCase()):x.g===G);
+    $("wkList").innerHTML=its.length?its.map(x=>{ const c=WK.cats[x.c];
+      return '<div class="wi" style="--c:'+c[1]+'"><div class="wt"><span class="wn">'+esc(x.n)+'</span><span class="bd">'+c[0]+'</span><span class="nx">'+nextFor(c[2])+'</span></div>'+
+        (x.h?'<p>'+esc(x.h)+'</p>':'')+(x.a?'<p class="alt">地域によっては：'+esc(x.a)+'</p>':'')+'</div>'; }).join("")
+      :'<p class="small">見つかりませんでした。別の言い方（ひらがな・一部だけ）でも探せます。</p>';
+  }
+  $("wkTabs").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; G=b.dataset.g; $("wkQ").value=""; draw(); };
+  $("wkQ").oninput=draw;
+  const _r=render; render=function(){ _r.apply(this,arguments); draw(); };  // 登録を変えたら「次に出せる日」も更新
+  draw();
+})();
+</script>
+<p id="morelinks" style="text-align:center;margin:8px 16px 28px;font-size:14px"><a href="wakekata/">迷いやすいゴミの分け方一覧（乾電池・ガラス・スプレー缶…）</a> ・ <a href="https://hibitool.com/">日々のツール</a></p>
 </body>
 </html>
